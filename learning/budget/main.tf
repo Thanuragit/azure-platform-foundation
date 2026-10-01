@@ -6,6 +6,13 @@ terraform {
       version = "~> 5.7"
     }
   }
+  backend "azurerm" {
+    resource_group_name  = "rg-tfstate"
+    storage_account_name = "sttfstatethanura01"
+    container_name       = "tfstate"
+    key                  = "learning/budget.tfstate"
+    use_azuread_auth     = true
+  }
 }
 
 provider "azurerm" {
