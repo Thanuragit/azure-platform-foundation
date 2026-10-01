@@ -12,3 +12,8 @@ output "subnet_app_id" {
   description = "ID of the app subnet"
   value       = azurerm_subnet.app.id
 }
+
+output "nsg_app_id" {
+  description = "ID of the dev network secuirty group"
+  value       = azurerm_network_security_group.app.id
+}
