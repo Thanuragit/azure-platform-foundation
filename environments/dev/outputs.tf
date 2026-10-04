@@ -1,19 +1,15 @@
 output "resource_group_name" {
-  description = "Name of the dev resource group"
-  value       = azurerm_resource_group.this.name
+  value = module.network.resource_group_name
 }
 
 output "vnet_id" {
-  description = "ID of the dev virtual network"
-  value       = azurerm_virtual_network.this.id
+  value = module.network.vnet_id
 }
 
 output "subnet_app_id" {
-  description = "ID of the app subnet"
-  value       = azurerm_subnet.app.id
+  value = module.network.subnet_app_id
 }
 
 output "nsg_app_id" {
-  description = "ID of the dev network secuirty group"
-  value       = azurerm_network_security_group.app.id
+  value = module.network.nsg_app_id
 }
