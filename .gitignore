@@ -45,3 +45,6 @@ terraform.rc
 
 # Saved plan files
 *.tfplan
+
+#ignore lock.hcl files
+modules/**/.terraform.lock.hcl
