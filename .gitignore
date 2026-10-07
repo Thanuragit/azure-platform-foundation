@@ -48,3 +48,5 @@ terraform.rc
 
 #ignore lock.hcl files
 modules/**/.terraform.lock.hcl
+
+!environments/*/env.auto.tfvars

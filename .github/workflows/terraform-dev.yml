@@ -1,0 +1,79 @@
+name: terraform-dev
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "environments/dev/**"
+      - "modules/**"
+      - ".github/workflows/terraform-dev.yml"
+  push:
+    branches: [main]
+    paths:
+      - "environments/dev/**"
+      - "modules/**"
+      - ".github/workflows/terraform-dev.yml"
+
+permissions:
+  id-token: write   # allows the run to request its OIDC ID card
+  contents: read
+
+env:
+  ARM_USE_OIDC: "true"
+  ARM_CLIENT_ID: ${{ vars.AZURE_CLIENT_ID }}
+  ARM_TENANT_ID: ${{ vars.AZURE_TENANT_ID }}
+  ARM_SUBSCRIPTION_ID: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+  TF_VAR_subscription_id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+  TF_IN_AUTOMATION: "true"
+
+jobs:
+  plan:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: environments/dev
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.16.2
+
+      - name: Format check (whole repo)
+        run: terraform fmt -check -recursive
+        working-directory: .
+
+      - name: Module tests
+        working-directory: modules/network
+        run: |
+          terraform init -backend=false -input=false
+          terraform test
+
+      - run: terraform init -input=false
+      - run: terraform validate
+      - run: terraform plan -input=false -out=dev.tfplan
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dev-plan
+          path: environments/dev/dev.tfplan
+          retention-days: 1
+
+  apply:
+    needs: plan
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    environment: dev
+    defaults:
+      run:
+        working-directory: environments/dev
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.16.2
+      - uses: actions/download-artifact@v4
+        with:
+          name: dev-plan
+          path: environments/dev
+      - run: terraform init -input=false
+      - run: terraform apply -input=false dev.tfplan
