@@ -56,7 +56,7 @@ jobs:
       - run: terraform validate
       - run: terraform plan -input=false -out=dev.tfplan
 
-      - uses: actions/upload-artifact@7
+      - uses: actions/upload-artifact@v7
         with:
           name: dev-plan
           path: environments/dev/dev.tfplan
