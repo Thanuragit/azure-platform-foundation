@@ -32,7 +32,7 @@ env:
 
 jobs:
   plan:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     defaults:
       run:
         working-directory: environments/dev
@@ -65,7 +65,7 @@ jobs:
   apply:
     needs: plan
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     environment: dev
     defaults:
       run:
