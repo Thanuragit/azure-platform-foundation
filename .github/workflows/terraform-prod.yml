@@ -29,5 +29,5 @@ jobs:
     uses: ./.github/workflows/terraform-reusable.yml
     with:
       environment: prod
-      plan_client_id: ${{ vars.AZURE_CLIENT_ID_PROD }}
-      apply_client_id: ${{ vars.AZURE_CLIENT_ID_PROD }}
+      plan_client_id: ${{ vars.AZURE_CLIENT_ID_PROD_PLAN }}
+      apply_client_id: ${{ vars.AZURE_CLIENT_ID_PROD_APPLY }}
