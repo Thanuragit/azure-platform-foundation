@@ -1,0 +1,33 @@
+name: terraform-prod
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "environments/prod/**"
+      - "modules/**"
+      - ".github/workflows/terraform-prod.yml"
+      - ".github/workflows/terraform-reusable.yml"
+  push:
+    branches: [main]
+    paths:
+      - "environments/prod/**"
+      - "modules/**"
+      - ".github/workflows/terraform-prod.yml"
+      - ".github/workflows/terraform-reusable.yml"
+
+permissions:
+  id-token: write
+  contents: read
+
+concurrency:
+  group: terraform-prod
+  cancel-in-progress: false
+
+jobs:
+  prod:
+    uses: ./.github/workflows/terraform-reusable.yml
+    with:
+      environment: prod
+      plan_client_id: ${{ vars.AZURE_CLIENT_ID_PROD }}
+      apply_client_id: ${{ vars.AZURE_CLIENT_ID_PROD }}

@@ -1,0 +1,33 @@
+name: terraform-test
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "environments/test/**"
+      - "modules/**"
+      - ".github/workflows/terraform-test.yml"
+      - ".github/workflows/terraform-reusable.yml"
+  push:
+    branches: [main]
+    paths:
+      - "environments/test/**"
+      - "modules/**"
+      - ".github/workflows/terraform-test.yml"
+      - ".github/workflows/terraform-reusable.yml"
+
+permissions:
+  id-token: write
+  contents: read
+
+concurrency:
+  group: terraform-test
+  cancel-in-progress: false
+
+jobs:
+  test:
+    uses: ./.github/workflows/terraform-reusable.yml
+    with:
+      environment: test
+      plan_client_id: ${{ vars.AZURE_CLIENT_ID_TEST }}
+      apply_client_id: ${{ vars.AZURE_CLIENT_ID_TEST }}
