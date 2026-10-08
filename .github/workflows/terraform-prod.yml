@@ -1,19 +1,19 @@
-name: terraform-dev
+name: terraform-prod
 
 on:
   pull_request:
     branches: [main]
     paths:
-      - "environments/dev/**"
+      - "environments/prod/**"
       - "modules/**"
-      - ".github/workflows/terraform-dev.yml"
+      - ".github/workflows/terraform-prod.yml"
       - ".github/workflows/terraform-reusable.yml"
   push:
     branches: [main]
     paths:
-      - "environments/dev/**"
+      - "environments/prod/**"
       - "modules/**"
-      - ".github/workflows/terraform-dev.yml"
+      - ".github/workflows/terraform-prod.yml"
       - ".github/workflows/terraform-reusable.yml"
 
 permissions:
@@ -21,13 +21,13 @@ permissions:
   contents: read
 
 concurrency:
-  group: terraform-dev
+  group: terraform-prod
   cancel-in-progress: false
 
 jobs:
-  dev:
+  prod:
     uses: ./.github/workflows/terraform-reusable.yml
     with:
-      environment: dev
-      plan_client_id: ${{ vars.AZURE_CLIENT_ID_DEV }}
-      apply_client_id: ${{ vars.AZURE_CLIENT_ID_DEV }}
+      environment: prod
+      plan_client_id: ${{ vars.AZURE_CLIENT_ID_PROD }}
+      apply_client_id: ${{ vars.AZURE_CLIENT_ID_PROD }}
