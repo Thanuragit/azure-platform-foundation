@@ -12,6 +12,10 @@ on:
       apply_client_id:
         type: string
         required: true
+      working_directory:        
+        type: string
+        required: false        
+        default: "" 
 
 permissions:
   id-token: write
@@ -22,7 +26,7 @@ jobs:
     runs-on: ubuntu-24.04
     defaults:
       run:
-        working-directory: environments/${{ inputs.environment }}
+        working-directory: ${{ inputs.working_directory || format('environments/{0}', inputs.environment) }}
     env:
       ARM_USE_OIDC: "true"
       ARM_CLIENT_ID: ${{ inputs.plan_client_id }}
@@ -41,7 +45,7 @@ jobs:
       - uses: actions/upload-artifact@v7
         with:
           name: ${{ inputs.environment }}-plan
-          path: environments/${{ inputs.environment }}/${{ inputs.environment }}.tfplan
+          path: ${{ inputs.working_directory || format('environments/{0}', inputs.environment) }}/${{ inputs.environment }}.tfplan
           retention-days: 1
 
   apply:
@@ -51,7 +55,7 @@ jobs:
     environment: ${{ inputs.environment }}
     defaults:
       run:
-        working-directory: environments/${{ inputs.environment }}
+        working-directory: ${{ inputs.working_directory || format('environments/{0}', inputs.environment) }}
     env:
       ARM_USE_OIDC: "true"
       ARM_CLIENT_ID: ${{ inputs.apply_client_id }}
@@ -67,6 +71,6 @@ jobs:
       - uses: actions/download-artifact@v8
         with:
           name: ${{ inputs.environment }}-plan
-          path: environments/${{ inputs.environment }}
+          path: ${{ inputs.working_directory || format('environments/{0}', inputs.environment) }}
       - run: terraform init -input=false
       - run: terraform apply -input=false ${{ inputs.environment }}.tfplan
