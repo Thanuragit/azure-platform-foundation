@@ -1,0 +1,32 @@
+name: terraform-governance
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "governance/**"
+      - ".github/workflows/terraform-governance.yml"
+      - ".github/workflows/terraform-reusable.yml"
+  push:
+    branches: [main]
+    paths:
+      - "governance/**"
+      - ".github/workflows/terraform-governance.yml"
+      - ".github/workflows/terraform-reusable.yml"
+
+permissions:
+  id-token: write
+  contents: read
+
+concurrency:
+  group: terraform-governance
+  cancel-in-progress: false
+
+jobs:
+  governance:
+    uses: ./.github/workflows/terraform-reusable.yml
+    with:
+      environment: governance
+      working_directory: governance
+      plan_client_id: ${{ vars.AZURE_CLIENT_ID_GOVERNANCE }}
+      apply_client_id: ${{ vars.AZURE_CLIENT_ID_GOVERNANCE }}
