@@ -29,6 +29,12 @@ resource "azurerm_management_group_policy_assignment" "hcta-allowed-locations" {
   enforce              = false
   location             = "australiaeast"
 
+  parameters = jsonencode({
+    listOfAllowedLocations = {
+      value = ["australiaeast"]
+    }
+  })
+
   identity {
     type = "SystemAssigned"
   }
@@ -41,11 +47,19 @@ data "azurerm_policy_definition_built_in" "require-tag" {
 
 # 6. ASSIGN it to the HCTA MGT Group
 resource "azurerm_management_group_policy_assignment" "htca-require-tag" {
-  name                 = "HCTA-Required-Tag"
+  for_each = toset(local.required_tags)
+
+  name                 = "HCTA-ReqTag-${each.value}" # ← unique name
   policy_definition_id = data.azurerm_policy_definition_built_in.require-tag.id
   management_group_id  = data.azurerm_management_group.hcta.id
   enforce              = false
   location             = "australiaeast"
+
+  parameters = jsonencode({
+    tagName = {
+      value = each.value
+    }
+  })
 
   identity {
     type = "SystemAssigned"
