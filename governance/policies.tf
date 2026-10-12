@@ -60,11 +60,6 @@ resource "azurerm_management_group_policy_assignment" "hcta-require-tag" {
   })
 }
 
-moved {
-  from = azurerm_management_group_policy_assignment.htca-require-tag
-  to   = azurerm_management_group_policy_assignment.hcta-require-tag
-}
-
 # 7. FIND the built-in Network interfaces should not have public IPs policy (it already exists in Azure)
 data "azurerm_policy_definition_built_in" "nic-no-pip" {
   display_name = "Network interfaces should not have public IPs"
