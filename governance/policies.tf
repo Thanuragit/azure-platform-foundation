@@ -27,17 +27,14 @@ resource "azurerm_management_group_policy_assignment" "hcta-allowed-locations" {
   policy_definition_id = data.azurerm_policy_definition_built_in.allowed-locations.id
   management_group_id  = data.azurerm_management_group.hcta.id
   enforce              = false
-  location             = "australiaeast"
+
+
 
   parameters = jsonencode({
     listOfAllowedLocations = {
       value = ["australiaeast"]
     }
   })
-
-  identity {
-    type = "SystemAssigned"
-  }
 }
 
 # 5. FIND the built-in equire a tag on resources policy (it already exists in Azure)
@@ -46,24 +43,26 @@ data "azurerm_policy_definition_built_in" "require-tag" {
 }
 
 # 6. ASSIGN it to the HCTA MGT Group
-resource "azurerm_management_group_policy_assignment" "htca-require-tag" {
+resource "azurerm_management_group_policy_assignment" "hcta-require-tag" {
   for_each = toset(local.required_tags)
 
   name                 = "HCTA-ReqTag-${each.value}" # ← unique name
   policy_definition_id = data.azurerm_policy_definition_built_in.require-tag.id
   management_group_id  = data.azurerm_management_group.hcta.id
   enforce              = false
-  location             = "australiaeast"
+
+
 
   parameters = jsonencode({
     tagName = {
       value = each.value
     }
   })
+}
 
-  identity {
-    type = "SystemAssigned"
-  }
+moved {
+  from = azurerm_management_group_policy_assignment.htca-require-tag
+  to   = azurerm_management_group_policy_assignment.hcta-require-tag
 }
 
 # 7. FIND the built-in Network interfaces should not have public IPs policy (it already exists in Azure)
@@ -75,13 +74,8 @@ data "azurerm_policy_definition_built_in" "nic-no-pip" {
 resource "azurerm_management_group_policy_assignment" "hcta-nic-no-pip" {
   name                 = "HCTA-No-PIP-on-NIC"
   policy_definition_id = data.azurerm_policy_definition_built_in.nic-no-pip.id
-  management_group_id  = data.azurerm_management_group.hcta.id
+  management_group_id  = azurerm_management_group.corp.id
   enforce              = false
-  location             = "australiaeast"
-
-  identity {
-    type = "SystemAssigned"
-  }
 }
 
 # 9. FIND the built-in Storage account public access should be disallowed policy (it already exists in Azure)
@@ -95,9 +89,4 @@ resource "azurerm_management_group_policy_assignment" "hcta-stg-no-pubaccess" {
   policy_definition_id = data.azurerm_policy_definition_built_in.stg-no-pubaccess.id
   management_group_id  = data.azurerm_management_group.hcta.id
   enforce              = false
-  location             = "australiaeast"
-
-  identity {
-    type = "SystemAssigned"
-  }
 }
