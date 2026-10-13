@@ -26,7 +26,7 @@ resource "azurerm_management_group_policy_assignment" "hcta-allowed-locations" {
   name                 = "HCTA-Allowed-locations"
   policy_definition_id = data.azurerm_policy_definition_built_in.allowed-locations.id
   management_group_id  = data.azurerm_management_group.hcta.id
-  enforce              = false
+  enforce              = true
 
 
 
@@ -49,7 +49,7 @@ resource "azurerm_management_group_policy_assignment" "hcta-require-tag" {
   name                 = "HCTA-ReqTag-${each.value}" # ← unique name
   policy_definition_id = data.azurerm_policy_definition_built_in.require-tag.id
   management_group_id  = data.azurerm_management_group.hcta.id
-  enforce              = false
+  enforce              = true
 
 
 
@@ -70,7 +70,7 @@ resource "azurerm_management_group_policy_assignment" "hcta-nic-no-pip" {
   name                 = "HCTA-No-PIP-on-NIC"
   policy_definition_id = data.azurerm_policy_definition_built_in.nic-no-pip.id
   management_group_id  = azurerm_management_group.corp.id
-  enforce              = false
+  enforce              = true
 }
 
 # 9. FIND the built-in Storage account public access should be disallowed policy (it already exists in Azure)
@@ -83,5 +83,9 @@ resource "azurerm_management_group_policy_assignment" "hcta-stg-no-pubaccess" {
   name                 = "HCTA-Deny-Stg-PubAccess"
   policy_definition_id = data.azurerm_policy_definition_built_in.stg-no-pubaccess.id
   management_group_id  = data.azurerm_management_group.hcta.id
-  enforce              = false
+  enforce              = true
+
+  parameters = jsonencode({
+    effect = { value = "Deny" }
+  })
 }
